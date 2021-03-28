@@ -4,12 +4,126 @@ let postsObj = require('../routes/blog/_posts.json');
 require('dotenv').config();
 
 const API = process.env.GHOST_API;
-const writeFile = (obj) => {
+const blogTitle = process.env.BLOG_TITLE;
+const blogUrl = process.env.BLOG_URL;
+const blogCover = process.env.BLOG_COVER;
+const blogDesc = process.env.BLOG_DESC;
+const blogFavicon = process.env.BLOG_FAVICON;
+
+const getDate = (date) => {
+    if(date) {
+        return new Date(date).toUTCString();
+    } else {
+        return new Date().toUTCString();
+    }
+}
+
+const writeFile = async (obj) => {
     const parseData = JSON.stringify(obj);
+    const rss = await createRss(obj);
+    const sitemap = await createSitemap(obj);
     fs.writeFileSync("./src/routes/blog/_posts.json", parseData);
-	console.log("Datos guardados");
+    console.log("Datos guardados");
+    fs.writeFileSync('./static/rss.xml', rss)
+    console.log("Update rss.xml");
+    fs.writeFileSync('./static/sitemap.xml', sitemap)
+    console.log("Update sitemap.xml");
 };
 
+const createRss = async (data) => {
+
+    const paseItems = await data.map(item => {
+        const pubDate = getDate(item.createdAt);
+        return `
+            <item>
+                <title>
+                    <![CDATA[${item.title}]]>
+                </title>
+                <link>
+                    ${blogUrl}/blog/${item.slug}
+                </link>
+                <description>
+                    <![CDATA[${item.desc}]]>
+                </description>
+                <category>
+                    <![CDATA[${item.tag}]]>
+                </category>
+                <dc:creator>
+                    <![CDATA[${blogTitle}]]>
+                </dc:creator>
+                <pubDate>
+                    ${pubDate}
+                </pubDate>
+                <media:content url="${blogCover}" medium="image" />
+                <content:encoded>
+                    <![CDATA[${item.html}]]>
+                </content:encoded>
+            </item>
+        `
+    }).join('');
+
+    const template = `
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <rss version="2.0">
+            <channel>
+                <title>
+                    <![CDATA[${blogTitle}]]>
+                </title>
+                <description>
+                    <![CDATA[${blogDesc}]]>
+                </description>
+                <image>
+                    <url>
+                        ${blogFavicon}
+                    </url>
+                    <title>
+                    <![CDATA[${blogTitle}]]>
+                    </title>
+                    <link>${blogUrl}</link>
+                </image>
+                <generator>
+                    lahincapie
+                </generator>
+                <lastBuildDate>
+                    ${getDate()}
+                </lastBuildDate>
+                <atom:link href="${blogUrl}/rss.xml" rel="selft" type="application/rss+xml" />
+                <ttl>60</ttl>
+                ${paseItems}
+            </channel>
+        </rss>`;
+        return template;
+};
+
+const createSitemap = async (data) => {
+    const parseItems = await data.map(item => {
+        return `
+            <url>
+                <loc>
+                    ${blogUrl}/blog/${item.slug}
+                </loc>
+                <lastmod>
+                    ${getDate(item.createdAt)}
+                </lastmod>
+                <priority>0-80</priority>
+            </url>
+        `;
+    }).join('');
+    const template = `
+        <?xml version="1.0" encoding="UTF-8"?>
+        <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+            <url>
+                <loc>${blogUrl}</loc>
+                <lastmod>
+                    ${getDate()}
+                </lastmod>
+                <priority>1.0</priority>
+            </url>
+            ${parseItems}
+        </urlset>`
+
+    return template;
+}
 
 const fetchData = async() => {
     const response = await fetch(API);
