@@ -45,6 +45,7 @@
 </svelte:head>
 
 <div class="Home">
+hola esta es la pagina principal
 	<div class="Posts">
 		{#each posts as post}
 			<Post {post} />
