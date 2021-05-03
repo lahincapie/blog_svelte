@@ -25,7 +25,6 @@
     .Greeting__content h1 {
         margin-block-start: 20px;
         font-size: 2.4rem;
-        line-height: 3rem;
         color: rgba(255, 255, 255, 0.8)
     }
     .Greeting__content h1 span {
