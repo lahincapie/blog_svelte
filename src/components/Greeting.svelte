@@ -2,30 +2,32 @@
     .Greeting {
         width: 100%;
         height: 380px;
-        display: flex;
-        justify-content: center;
-        align-items:flex-end;
         background-image: linear-gradient(rgba(29, 29, 29, 0.8), rgba(29, 29, 29, 0.9)), url("greeting-background.jpg");
         background-position: center;
         background-repeat: no-repeat;
         background-size: cover;
+        padding-inline: 30px;
+        padding-block: 20px;
     }
     .Greeting__content {
-        padding-inline: 30px;
-        padding-block-end: 40px;
-        text-align: center;
+        height: 320px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
     }
     .Greeting__content figure {
         width: 100px;
-        margin: auto
+        margin-inline: auto;
     }
     .Greeting__content img {
         width: 100%;
     }
     .Greeting__content h1 {
-        margin-block-start: 20px;
-        font-size: 2.4rem;
-        color: rgba(255, 255, 255, 0.8)
+        font-size: 2rem;
+        line-height: 3.4rem;
+        color: rgba(255, 255, 255, 0.8);
+        text-align: center;
     }
     .Greeting__content h1 span {
         color: var(--fourth__color);

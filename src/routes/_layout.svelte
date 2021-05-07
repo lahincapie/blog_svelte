@@ -9,9 +9,18 @@
 </script>
 
 <style>
-
+	.wrapper__content {
+		position: relative;
+		max-width: 56em;
+		background-color: white;
+		margin: 0 auto;
+		box-sizing: border-box;
+	}
 </style>
-<Greeting />
+
+<div class="wrapper__content">
+	<Greeting />
+</div>
 
 
 
